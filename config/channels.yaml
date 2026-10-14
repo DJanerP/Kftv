@@ -1,0 +1,129 @@
+# Mundia2026 — Registro de canales
+#
+# method:
+#   rtve_ztnr → RTVE: obtiene URL firmada del servidor ZTNR (token expira ~7 días)
+#               Requiere el campo id_asset (idAsset de la API de RTVE)
+#   yt-dlp    → usa yt-dlp para extraer la URL del stream, luego ffmpeg graba con duración
+#   ffmpeg    → URL directa conocida (HLS/m3u8/MP3), ffmpeg graba directamente
+#
+# Canales con geo-restricción desde España marcados con geo_bloqueado: true
+
+canales:
+
+  # ──────────────────────────────────────────────────────────────────
+  # ESPAÑA — TV pública
+  # ──────────────────────────────────────────────────────────────────
+  rtve_la1:
+    nombre: "RTVE La 1"
+    pais: "ES"
+    tipo: "tv"
+    idioma: "Español (España)"
+    method: "ffmpeg"
+    url: "https://rtvelivestream.rtve.es/rtvesec/la1/la1_main.m3u8"
+    notas: "720p H264, AAC español. Geo-restringida a España (funciona sin VPN). No necesita autenticación."
+
+  rtve_la2:
+    nombre: "RTVE La 2"
+    pais: "ES"
+    tipo: "tv"
+    idioma: "Español (España)"
+    method: "ffmpeg"
+    url: "https://rtvelivestream.rtve.es/rtvesec/la2/la2_main.m3u8"
+    notas: "Canal 2. Misma CDN que La 1. Verificar si emite contenido del Mundial."
+
+  # ──────────────────────────────────────────────────────────────────
+  # ESPAÑA — Radio
+  # ──────────────────────────────────────────────────────────────────
+  cadena_ser:
+    nombre: "Cadena SER"
+    pais: "ES"
+    tipo: "radio"
+    idioma: "Español (España)"
+    method: "ffmpeg"
+    # URL directa del stream de audio de la SER
+    url: "https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3"
+    extension: "mp3"
+    notas: "Solo audio. Narración española clásica."
+
+  rne_radio1:
+    nombre: "RNE Radio Nacional"
+    pais: "ES"
+    tipo: "radio"
+    idioma: "Español (España)"
+    method: "ffmpeg"
+    url: "https://icecast.rtve.es/rne/rne1/directo.mp3"
+    extension: "mp3"
+    notas: "Solo audio. Alternativa pública."
+
+  # ──────────────────────────────────────────────────────────────────
+  # MÉXICO — TV pública
+  # Televisoras públicas mexicanas con excelentes locutores
+  # ──────────────────────────────────────────────────────────────────
+  canal_once:
+    nombre: "Canal Once (IPN)"
+    pais: "MX"
+    tipo: "tv"
+    idioma: "Español (México)"
+    method: "yt-dlp"
+    url: "https://www.once.tv/en-vivo/"
+    notas: "TV pública del IPN. Locutores de calidad. Puede necesitar VPN desde España."
+    geo_bloqueado: false   # Probar primero; a veces accesible desde ES
+
+  canal_22:
+    nombre: "Canal 22"
+    pais: "MX"
+    tipo: "tv"
+    idioma: "Español (México)"
+    method: "yt-dlp"
+    url: "https://www.canal22.org.mx/transmision-en-vivo/"
+    notas: "Canal cultural público de México."
+    geo_bloqueado: false
+
+  azteca_deportes:
+    nombre: "TV Azteca Deportes"
+    pais: "MX"
+    tipo: "tv"
+    idioma: "Español (México)"
+    method: "yt-dlp"
+    url: "https://www.tvazteca.com/aztecadeportes/canal-en-vivo"
+    notas: "Canal deportivo comercial. Tiene derechos del Mundial en México. Probar acceso."
+    geo_bloqueado: true
+
+  # ──────────────────────────────────────────────────────────────────
+  # ARGENTINA
+  # ──────────────────────────────────────────────────────────────────
+  tv_publica_ar:
+    nombre: "TV Pública Argentina (Canal 7)"
+    pais: "AR"
+    tipo: "tv"
+    idioma: "Español (Argentina)"
+    method: "yt-dlp"
+    url: "https://www.tvpublica.com.ar/en-vivo/"
+    notas: "Canal 7 Argentina. Cubre partidos de selecciones sudamericanas."
+    geo_bloqueado: true
+
+  # ──────────────────────────────────────────────────────────────────
+  # PARAGUAY
+  # ──────────────────────────────────────────────────────────────────
+  snt_paraguay:
+    nombre: "SNT Paraguay"
+    pais: "PY"
+    tipo: "tv"
+    idioma: "Español (Paraguay)"
+    method: "yt-dlp"
+    url: "https://www.snt.com.py/en-vivo/"
+    notas: "Canal del Estado paraguayo."
+    geo_bloqueado: true
+
+  # ──────────────────────────────────────────────────────────────────
+  # YOUTUBE — Canales de TV pública con stream en YouTube
+  # Completar la URL cuando el canal tenga un live activo
+  # ──────────────────────────────────────────────────────────────────
+  # youtube_rtve:
+  #   nombre: "RTVE en YouTube"
+  #   pais: "ES"
+  #   tipo: "tv"
+  #   idioma: "Español (España)"
+  #   method: "yt-dlp"
+  #   url: "https://www.youtube.com/@rtve/live"
+  #   notas: "RTVE emite en directo en YouTube para algunos eventos."

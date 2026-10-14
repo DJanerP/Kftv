@@ -1,0 +1,26 @@
+# Mundia2026 — Configuración principal
+
+grabaciones:
+  directorio: "/home/david/Portfolio/Mundia2026/grabaciones"
+  # Formato del nombre de archivo. Variables disponibles:
+  # {fecha} {hora} {local} {visitante} {canal} {fase} {grupo}
+  formato: "{fecha}_{local}_vs_{visitante}_{canal}"
+
+grabacion:
+  buffer_inicio_min: 10      # Empezar a grabar X min antes del pitido inicial
+  buffer_final_min: 45       # Seguir grabando X min después del tiempo 90' (cubre prórrogas + penaltis)
+  # Duración total = 90 + 45 = 135 min = 2h15m
+
+  calidad: "best"            # Calidad de video: best | 1080p | 720p | 480p
+  extension_video: "ts"      # Contenedor para video (ts es más robusto para streams cortados)
+  extension_radio: "mp3"     # Para canales de radio
+
+# Canales a grabar por defecto para TODOS los partidos
+# Puedes sobreescribir esto por partido editando partidos.json (campo "canales")
+canales_por_defecto:
+  - rtve_la1
+  # - cadena_ser   # Descomentar para grabar radio también
+
+logs:
+  directorio: "/home/david/Portfolio/Mundia2026/logs"
+  nivel: "INFO"              # DEBUG | INFO | WARNING | ERROR

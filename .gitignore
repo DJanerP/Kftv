@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+grabaciones/
+logs/
+mundia.log
+mundia.pid
+*.pyc
+
+# fuentes locales, no se publican
+sources.yaml

@@ -1,0 +1,85 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mundia2026 — relay</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:#000; color:#eee;
+               font:15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #video { width:100%; height:100%; object-fit:contain; background:#000; display:block; }
+  #capa { position:fixed; inset:0; display:flex; flex-direction:column;
+          align-items:center; justify-content:center; gap:18px; padding:24px;
+          text-align:center; background:#000; }
+  #capa.oculta { display:none; }
+  button { font:600 20px/1 inherit; padding:18px 34px; border:0; border-radius:12px;
+           background:#e8e8e8; color:#111; cursor:pointer; }
+  button:disabled { opacity:.4; }
+  #estado { font-variant-numeric:tabular-nums; opacity:.75; max-width:32rem; }
+  #barra { position:fixed; left:0; right:0; bottom:0; padding:6px 10px; font-size:12px;
+           background:#0009; opacity:0; transition:opacity .2s; font-variant-numeric:tabular-nums; }
+  #barra.visible { opacity:1; }
+</style>
+
+<video id="video" playsinline controls></video>
+<div id="capa">
+  <div id="estado">Conectando con el relay…</div>
+  <button id="play" disabled>Ver el partido</button>
+</div>
+<div id="barra"></div>
+
+<script src="/hls.js"></script>
+<script>
+const video = document.getElementById('video');
+const capa  = document.getElementById('capa');
+const play  = document.getElementById('play');
+const txt   = document.getElementById('estado');
+const barra = document.getElementById('barra');
+
+// El relay abre el puerto antes de tener la ventana llena, asi que la pagina puede
+// llegar mientras aun se llena: se sondea /estado hasta que dice que esta listo.
+async function esperarRelay() {
+  try {
+    const e = await (await fetch('/estado', {cache:'no-store'})).json();
+    if (e.listo) {
+      txt.textContent = `Listo — ${e.ventana} segmentos de colchón.`;
+      play.disabled = false;
+      return;
+    }
+    txt.textContent = `Llenando el colchón… ${e.en_cache}/${e.ventana + e.colchon} segmentos`;
+  } catch (_) {
+    txt.textContent = 'El relay no responde. ¿Está arrancado en el sobremesa?';
+  }
+  setTimeout(esperarRelay, 1500);
+}
+esperarRelay();
+
+play.onclick = () => {
+  capa.classList.add('oculta');
+  barra.classList.add('visible');
+  const url = '/index.m3u8';
+  if (window.Hls && Hls.isSupported()) {
+    // Chrome de Android no reproduce HLS en un <video> a pelo: hace falta MSE.
+    const hls = new Hls({ liveSyncDurationCount: 3, maxBufferLength: 60 });
+    hls.loadSource(url);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+    hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) hls.startLoad(); });
+  } else {
+    // Safari/iPadOS lo lleva de serie.
+    video.src = url;
+    video.play();
+  }
+};
+
+setInterval(async () => {
+  if (!barra.classList.contains('visible')) return;
+  let buf = 0;
+  try { if (video.buffered.length) buf = video.buffered.end(video.buffered.length-1) - video.currentTime; } catch (_) {}
+  try {
+    const e = await (await fetch('/estado', {cache:'no-store'})).json();
+    const alerta = e.segundos_sin_ingerir > 30 ? '  ⚠ relay parado' : '';
+    barra.textContent = `buffer ${buf.toFixed(0)} s · relay ${e.segundos_sin_ingerir} s · huecos ${e.huecos} · fallos ${e.fallos}${alerta}`;
+  } catch (_) { barra.textContent = `buffer ${buf.toFixed(0)} s · relay sin respuesta`; }
+}, 2000);
+</script>
